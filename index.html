@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 15px; background: #111; color: #eee; }
+    input, button { margin: 5px 0; padding: 8px; border-radius: 6px; border: none; }
+    input { width: 95%; }
+    button { background: #0d6efd; color: white; cursor: pointer; }
+    #status { margin-top: 10px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h3>QR Attendance Time Fixing</h3>
+  <label>Enter Fixing Time (HH:MM:SS):</label>
+  <input type="text" id="timeInput" placeholder="01:05:07">
+  <button onclick="startCountdown()">Start</button>
+  <div id="display"></div>
+  <div id="status"></div>
+
+  <script>
+    let interval;
+
+    function startCountdown() {
+      let input = document.getElementById("timeInput").value;
+      let parts = input.split(":").map(Number);
+      let totalSeconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+
+      clearInterval(interval);
+
+      interval = setInterval(() => {
+        if (totalSeconds > 0) {
+          totalSeconds--;
+          let hrs = Math.floor(totalSeconds / 3600);
+          let mins = Math.floor((totalSeconds % 3600) / 60);
+          let secs = totalSeconds % 60;
+
+          let timeString = `${hrs}hr ${mins}min ${secs}sec`;
+          let status = "Working on";
+
+          document.getElementById("display").innerText = timeString;
+          document.getElementById("status").innerText = "Status: " + status;
+
+          google.script.run.updateCountdown(timeString, status);
+
+        } else {
+          clearInterval(interval);
+          let status = "Done";
+          document.getElementById("display").innerText = "0hr 0min 0sec";
+          document.getElementById("status").innerText = "Status: " + status;
+          google.script.run.updateCountdown("0hr 0min 0sec", status);
+        }
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
